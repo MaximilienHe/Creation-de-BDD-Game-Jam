@@ -1,0 +1,106 @@
+CREATE TABLE Comptes (
+	IdCompte INT NOT NULL AUTO_INCREMENT,
+	Nom varchar(50) NOT NULL,
+	Email varchar(50) NOT NULL UNIQUE,
+	MotDePasse varchar(60) NOT NULL,
+	LienPhotoDeProfile varchar(1000),
+	ReseauSocial varchar(50), 
+	Biographie varchar(400),
+
+	CONSTRAINT Comptes_PK PRIMARY KEY (IdCompte)
+);
+
+CREATE TABLE Utilisateurs (
+	IdUtilisateur INT NOT NULL AUTO_INCREMENT,
+
+	CONSTRAINT Utilisateurs_PK PRIMARY KEY (IdUtilisateur)
+);
+
+CREATE TABLE Jurys (
+	IdJury INT NOT NULL AUTO_INCREMENT,
+
+	CONSTRAINT Jurys_PK PRIMARY KEY (IdJury)
+);
+
+CREATE TABLE AssignerRole (
+	Annee INT NOT NULL,
+	IdCompte INT NOT NULL,
+	IdUtilisateur INT DEFAULT NULL,	
+	IdJury INT DEFAULT NULL,
+	
+	CONSTRAINT AssignerRole_PK PRIMARY KEY (Annee, IdCompte),
+	CONSTRAINT AssignerRole_Comptes_FK FOREIGN KEY (IdCompte) REFERENCES Comptes(IdCompte),
+	CONSTRAINT AssignerRole_Utilisateurs_FK FOREIGN KEY (IdUtilisateur) REFERENCES Utilisateurs(IdUtilisateur),
+	CONSTRAINT AssignerRole_Jurys_FK FOREIGN KEY (IdJury) REFERENCES Jurys(IdJury)
+);
+
+CREATE TABLE Salles (
+	NumeroSalle INT NOT NULL,
+
+	CONSTRAINT Salles_PK PRIMARY KEY (NumeroSalle)
+);
+
+CREATE TABLE GroupesJeux (
+	IdGroupeJeu INT NOT NULL AUTO_INCREMENT,
+	NumeroSalle INT NOT NULL,
+	NomGroupe VARCHAR(20) NOT NULL,
+	Description VARCHAR(400),
+	ReseauSocial VARCHAR(50),
+	Annee INT NOT NULL,
+	NomJeu VARCHAR(50) NOT NULL,
+	Theme VARCHAR(50),
+	URLJeu VARCHAR(50) NOT NULL,
+
+	CONSTRAINT GroupesJeux_PK PRIMARY KEY (IdGroupeJeu),
+	CONSTRAINT GroupesJeux_Salles_FK FOREIGN KEY (NumeroSalle) REFERENCES Salles(NumeroSalle)
+); 
+
+CREATE TABLE Noter (
+	IdJury INT NOT NULL,
+	IdGroupeJeu INT NOT NULL,
+	NoteGameplay INT NOT NULL,
+	NoteJPM INT NOT NULL,
+	NoteStyle INT NOT NULL,
+	NotePresentation INT NOT NULL,
+	Commentaire VARCHAR(400),
+
+	CONSTRAINT Noter_PK PRIMARY KEY (IdJury, IdGroupeJeu),
+	CONSTRAINT Notes_Jurys_FK FOREIGN KEY (IdJury) REFERENCES Jurys(IdJury),
+	CONSTRAINT Notes_GroupesJeux_FK FOREIGN KEY (IdGroupeJeu) REFERENCES GroupesJeux(IdGroupeJeu)
+);
+
+CREATE TABLE UtilisateursConstituerGroupesJeux (
+	IdUtilisateur INT NOT NULL,
+	IdGroupeJeu INT NOT NULL,
+	
+	CONSTRAINT UtilisateursConstituerGroupesJeux_PK PRIMARY KEY (IdUtilisateur, IdGroupeJeu),
+	CONSTRAINT UtilisateursConstituerGroupesJeux_Utilisateurs_FK FOREIGN KEY (IdUtilisateur) REFERENCES Utilisateurs(IdUtilisateur),
+	CONSTRAINT UtilisateursConstituerGroupesJeux_GroupesJeux_FK FOREIGN KEY (IdGroupeJeu) REFERENCES GroupesJeux(IdGroupeJeu)
+);
+
+CREATE TABLE Versions (
+	IdVersion INT NOT NULL AUTO_INCREMENT,
+	IdGroupeJeu INT NOT NULL,
+	DateVersion DATE NOT NULL,
+	Description VARCHAR(400),
+	
+	CONSTRAINT Versions_PK PRIMARY KEY (IdVersion),
+	CONSTRAINT Versions_GroupesJeux_FK FOREIGN KEY (IdGroupeJeu) REFERENCES GroupesJeux(IdGroupeJeu)
+);
+
+CREATE TABLE Types (
+	IdType INT NOT NULL AUTO_INCREMENT, 
+	NomType VARCHAR(50) NOT NULL,
+	Description VARCHAR(400),
+
+	CONSTRAINT Types_PK PRIMARY KEY (IdType)
+);
+
+CREATE TABLE GroupesEtreTypes (
+	IdType INT NOT NULL,
+	IdGroupeJeu INT NOT NULL,
+	
+	CONSTRAINT GroupesEtreTypes_PK PRIMARY KEY (IdType, IdgroupeJeu),
+	CONSTRAINT GroupesEtreTypes_Types_FK FOREIGN KEY (IdType) REFERENCES Types(IdType),
+	CONSTRAINT GroupesEtreTypes_GroupesJeux_FK FOREIGN KEY (IdGroupeJeu) REFERENCES GroupesJeux(IdGroupeJeu)
+);
